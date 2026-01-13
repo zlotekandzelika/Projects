@@ -1,0 +1,78 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt 
+import seaborn as sns 
+from scipy import stats
+from sklearn.linear_model import LinearRegression
+import matplotlib.dates as mdates
+#uploading data 
+data = pd.read_csv('/Users/Apple/Desktop/National_River_Toxin_Dataset_1.csv')
+
+#initial data exploration 
+print(data.head())
+print(data.info())
+print(data.describe())
+
+#check for missing values 
+print(data.isnull().sum())
+
+#fill missing values to numeric columns only 
+numeric_columns = data.select_dtypes(include = [np.number]).columns
+data[numeric_columns] = data[numeric_columns].fillna(data[numeric_columns].mean())
+
+#Convert 'Date' to datetime 
+data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
+
+#calculate average level of toxins 
+Average_Toxin_Level = data[['Lead', 'Mercury', 'Arsenic']].mean()
+print(f"Average_Toxin_Level:\n{Average_Toxin_Level}")
+
+#identified top polluted river by average lead level 
+top_polluted_river = data.groupby('River_System') ['Lead'].mean().sort_values(ascending=False)
+print(f"top_polluted_river:\n{top_polluted_river.head()}")
+
+#bar chart for average lead levels per river 
+plt.figure(figsize=(10,6))
+top_polluted_river.plot(kind = 'bar', color = 'skyblue')
+plt.title=('polution')
+plt.ylabel('Lead_level')
+plt.xlabel('River_System')
+plt.legend(title='River')
+plt.show()
+
+#line graph for toxin level over time 
+plt.figure(figsize=(10,6))
+plt.figure(figsize=(10,6))
+sns.lineplot(x='Date', y='Lead', data=data, hue='River_System', errorbar=None) 
+errorbar=None
+plt.title=('lead level over time')
+plt.xlabel('Date')
+plt.ylabel('Lead_level')
+plt.show()
+
+#compute the correlation matrix using only numeric columns 
+
+corr_matrix = data[numeric_columns].corr()
+
+#heatmap for correlation between different parameters 
+plt.figure(figsize=(10,6))
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
+plt.title=('heatmap')
+plt.show()
+
+#T-test between two river system (Amozon and Nile) 
+
+amazon_data = data[data['River_System'] == 'Amazon']['Lead'].dropna()
+nile_data = data[data['River_System'] == 'Nile']['Lead'].dropna()
+t_stat, p_value = stats.ttest_ind(amazon_data, nile_data)
+print(f"T-test between Amazon and Nile: T-statistic = {t_stat}, P-value = {p_value}")
+
+#linear regression analysis for toxin level and pH level 
+
+subset = data[['pH_Level', 'Lead']].dropna()
+X = subset[['pH_Level']]
+y = subset['Lead']
+model = LinearRegression()
+model.fit(X, y)
+print(f"Linear Regression Coefficients: {model.coef_}")
+print(f"Linear Regression Interecept: {model.intercept_}")
