@@ -1,0 +1,107 @@
+import pandas as pd 
+import numpy as np 
+import matplotlib.pyplot as plt 
+import seaborn as sns 
+from scipy import stats
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from scipy.stats import ttest_ind
+
+#load the data
+
+df = pd.read_csv('/Users/Apple/Desktop/diabetes_medication_clinical_trial1_3.csv')
+print(df.head())
+
+#data exploration 
+print(f"DataFrame Shape: {df.shape}")
+df.info()
+df.describe()
+
+#data cleaning 
+print(f"Missing values:\n{df.isnull().sum()}")
+
+df.dropna()
+
+df['time'] = pd.to_numeric(df['time'], errors='coerce')
+
+#convert group to 'category'
+df['group']=df['group'].astype('category')
+df=pd.get_dummies(df, columns=['group'], drop_first=True)
+df.rename(columns={'group_treatment': 'group_treatment'}, inplace=True)
+print(df.head())
+df.dropna()
+
+#convert all columns used in modeling to numeric type 
+
+df['group_treatment'] = pd.to_numeric(df['group_treatment'], errors='coerce')
+df['time'] = pd.to_numeric(df['time'], errors='coerce')
+df['hba1c']=pd.to_numeric(df['hba1c'], errors='coerce')
+
+#calculate the average hba1c for the groups 
+avg_hba1c_treatment = df[df['group_treatment'] == 1]['hba1c'].mean()
+avg_hba1c_placebo = df[df['group_treatment'] == 0]['hba1c'].mean()
+print(f"Average hba1c level for treatment:{avg_hba1c_treatment}")
+print(f"Average hba1c level for placebo:{avg_hba1c_placebo}")
+
+#calculate change in hba1c for each subject 
+df['hba1c_change']=df.groupby('subject_id')['hba1c'].transform(lambda x: x - x.iloc[0])
+
+#count occurances of each type of adverse event 
+adverse_events = df['adverse_event'].value_counts()
+
+print(adverse_events)
+
+#graph plotting 
+
+plt.figure(figsize=(10,6))
+sns.lineplot(x='time', y='hba1c', hue='group_treatment', data=df)
+plt.title=('Hba1c levels over time')
+plt.xlabel('Time(weeks)')
+plt.show()
+
+#graph plotting 
+
+plt.figure(figsize=(10,6))
+sns.boxplot(x='group_treatment', y='hba1c', data=df, hue='group_treatment', palette='Set2')
+plt.title=('Final Hba1c levels: treatment vs placebo')
+plt.xlabel('group')
+plt.ylabel('Hba1c level')
+plt.show()
+
+plt.figure(figsize=(10,6))
+adverse_events.plot(kind='bar')
+plt.title=('Most common adverse events')
+plt.xlabel('adverse events')
+plt.ylabel('frequency')
+plt.show()
+
+plt.figure(figsize=(8,4))
+sns.scatterplot(x='initial_hba1c', y='hba1c_change', hue='group_treatment', palette='Set1', data=df)
+plt.title=('Initial Hba1c vs Change in Hba1c')
+plt.xlabel('Initial Hba1c level')
+plt.ylabel('Change in Hba1c')
+plt.show()
+
+t_stats, p_value = stats.ttest_ind(df[df['group_treatment'] == 1]['hba1c'], df[df['group_treatment'] == 0]['hba1c'])
+print(f"T-statistic: {t_stats}, P_value: {p_value}")
+
+model = smf.ols('hba1c ~ time + group_treatment', data=df).fit()
+aov_table=sm.stats.anova_lm(model, typ=2)
+print(aov_table)
+
+adverse_event_table = pd.crosstab(df['group_treatment'], df['adverse_event'])
+chi2, p, daf, expected = stats.chi2_contingency(adverse_event_table, correction=False)
+print(f"Chi-square test result: chi2 ={chi2}, p-value = {p}")
+
+if 'age_group' not in df.columns: 
+    df['age_group'] = pd.cut(df['age'], bins=[0, 30, 60, 90], labels=['young', 'middle aged', 'old'])
+    
+plt.figure(figsize=(10,6))
+sns.boxplot(x='age_group', y='hba1c', data=df, hue='group_treatment', palette='Set2')
+plt.title=('Hba1c reduction by age group and gender')
+plt.xlabel('age_group')
+plt.ylabel('Hba1c reduction')
+plt.show()
+
+correlation = df['duration_diabetes'].corr(df['hba1c_change'])
+print(f"Correlation between duration of diabetes and Hba1c reduction: {correlation}")
