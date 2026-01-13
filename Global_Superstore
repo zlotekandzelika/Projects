@@ -1,0 +1,86 @@
+import pandas as pd 
+import numpy as np
+import matplotlib.pyplot as plt 
+import seaborn as sns 
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+%matplotlib inline 
+
+df=pd.read_csv('/Users/Apple/Desktop/Global_Superstore.csv')
+df.head()
+print(df.shape)
+df.info()
+df.describe()
+print(df.isnull().sum())
+df.dropna(inplace=True)
+df['Order Date'] = pd.to_datetime(df['Order Date'])
+df['Ship date'] = pd.to_datetime(df['Ship Date'])               
+
+total_sale = df['Sales'].sum()
+total_profit = df['Profit'].sum()
+
+#top 10 products by sale 
+top_products = df.groupby('Product Name')['Sales'].sum().sort_values(ascending=False).head(10)
+print(top_products)
+
+#sales by region 
+sales_by_region = df.groupby('Region')['Sales'].sum()
+print(sales_by_region)
+
+#correlation between sales and profit 
+correlation = df['Sales'].corr(df['Profit'])
+print(f"Correlation between sales and profit:{correlation}")
+
+#bar plot of sales by product category 
+colours = ['red', 'blue', 'yellow']
+bars = sns.barplot(x='Category', y='Sales', data =df)
+for bar, color in zip(bars.patches, colours):
+    bar.set_color(color)
+plt.title=('sales by product category')
+plt.show()
+
+#create a new "Month" column from "order date" 
+df['Month'] = df['Order Date'].dt.to_period('M')
+
+#calculate monthly sales 
+monthly_sales = df.groupby('Month')['Sales'].sum()
+
+#ensure the index is in datetime format for plotting 
+monthly_sales.index = monthly_sales.index.to_timestamp()
+
+#plot monthly sales over time 
+monthly_sales.plot(kind='line')
+plt.title=('Montlhy Sales Over Time')
+plt.show()
+
+#scater plot of sales vs profit 
+sns.scatterplot(x='Sales', y='Profit', data=df)
+plt.title=('Sales vs Profit')
+plt.show()
+
+#pivot table for sales by region and product category 
+pivot_table = df.pivot_table(values = 'Sales', index = 'Region', columns = 'Category', aggfunc = 'sum')
+
+#heatmap of sale by region and product category 
+sns.heatmap(pivot_table, annot=True, fmt='.0f', cmap='YlGnBu')
+plt.title=('Sales by region and product category')
+plt.show()
+
+#seasonal decomposition of Time series(monthly sale)
+result = seasonal_decompose(monthly_sales, model='additive', period=12)
+result.plot()
+plt.show()
+
+#calculate total discount and total profit 
+total_discount = df['Discount'].sum()
+total_profit = df['Profit'].sum()
+
+#convert 'discount' and 'profit' columns to numeric 
+df['Discount'] = pd.to_numeric(df['Discount'], errors='coerce')
+df['Profit'] = pd.to_numeric(df['Profit'], errors='coerce')
+
+#calculate the correlation between discount and profit 
+discount_profit_correlation = df[['Discount', 'Profit']].corr().iloc[0,1]
+total_discount, total_profit, discount_profit_correlation 
+
+print(f"Total Sale: {total_sale}, Total Profit: {total_profit}")
