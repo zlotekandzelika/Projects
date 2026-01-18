@@ -10,22 +10,29 @@ impute missing values, detect outliers, and standardise categorical variables.
 • Performed exploratory data analysis (EDA) to summarise baseline patient characteristics, visualise treatment effects, and identify
 patterns in adverse events. Generated data visualisations such as line plots, boxplots, histograms, and bar charts in Python (Matplotlib,
 Seaborn) and Power BI to communicate preliminary insights.
+
 • Designed the study to test multiple hypotheses, including whether the treatment effect was statistically greater than placebo, whether
 results varied across demographic subgroups (age, sex, ethnicity), whether disease duration influenced responsiveness, and whether
 the drug maintained a favourable safety profile.
+
 • Synthesised results into clear data-driven narratives, highlighting that the medication produced statistically significant reductions in
 HbA1c, particularly among younger patients and those with shorter disease duration, while adverse events remained largely mild and
 non-serious.
 Thank you for your
 consideration.
+
 • Applied a range of statistical and analytical methods, including regression modelling, correlation analysis, subgroup comparisons, and
 hypothesis testing, to quantify treatment effects, explore demographic interactions, and evaluate safety signals.
+
 • Delivered a comprehensive analysis that supported regulatory approval applications, prescribing guidelines, and commercial rollout
 planning, reducing uncertainty for stakeholders and strengthening the drug’s clinical and business positioning.
+
 • Demonstrated ability to translate complex statistical findings into actionable insights, combining technical expertise with clear
 communication for cross-functional teams, including regulatory, clinical, and commercial stakeholders.
+
 • Overcame project challenges including missing data from patient dropouts and tight reporting deadlines by applying structured project
 management methods, weekly stakeholder check-ins, and agile-style work planning.
+
 • Documented analytical workflows and findings in clear, reproducible formats, ensuring that all outputs were suitable for regulatory
 reporting and evidence-based decision-making.
 
