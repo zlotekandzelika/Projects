@@ -1,9 +1,12 @@
 Clinical Trial Data Analysis: Evaluating Diabetes Medication Efficacy and Safety 2025
+
 • Conducted an end-to-end analysis of randomised controlled trial (RCT) data, investigating whether a novel diabetes medication
 significantly reduced HbA1c levels compared to placebo while maintaining an acceptable safety profile.
+
 • Managed large-scale patient-level datasets containing HbA1c measurements, demographic characteristics, medical histories, and
 adverse event logs, applying data wrangling and cleaning techniques in Python (Pandas, NumPy), SQL, and Excel to remove duplicates,
 impute missing values, detect outliers, and standardise categorical variables.
+
 • Performed exploratory data analysis (EDA) to summarise baseline patient characteristics, visualise treatment effects, and identify
 patterns in adverse events. Generated data visualisations such as line plots, boxplots, histograms, and bar charts in Python (Matplotlib,
 Seaborn) and Power BI to communicate preliminary insights.
